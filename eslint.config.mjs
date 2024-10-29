@@ -1,9 +1,20 @@
-import globals from "globals";
-import pluginJs from "@eslint/js";
-
-
-export default [
-  {files: ["**/*.js"], languageOptions: {sourceType: "commonjs"}},
-  {languageOptions: { globals: globals.browser }},
-  pluginJs.configs.recommended,
-];
+// eslint.config.mjs
+export default {
+  env: {
+      browser: false,
+      commonjs: true,
+      es2021: true,
+      node: true,
+      mocha: true
+  },
+  extends: 'eslint:recommended',
+  parserOptions: {
+      ecmaVersion: 12
+  },
+  rules: {
+      'no-unused-vars': 'warn',
+      'no-console': 'off',
+      'semi': ['error', 'always'],
+      'quotes': ['error', 'single']
+  }
+};

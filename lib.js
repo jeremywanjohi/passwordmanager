@@ -1,57 +1,61 @@
+// lib.js
+
 "use strict";
 
-const { getRandomValues } = require('crypto');
-
 /**
- * Converts a plaintext string into a buffer for use in SubtleCrypto functions.
- * @param {string} str - A plaintext string
- * @returns {Buffer} A buffer representation for use in SubtleCrypto functions
+ * Converts a string to a Uint8Array buffer.
+ *
+ * @param {string} str - The string to convert.
+ * @returns {Uint8Array} - The resulting buffer.
  */
 function stringToBuffer(str) {
-    return Buffer.from(str);
+  return new TextEncoder().encode(str);
 }
 
 /**
- * Converts a buffer object representing string data back into a string
- * @param {BufferSource} buf - A buffer containing string data
- * @returns {string} The original string
+ * Converts a buffer to a string.
+ *
+ * @param {Uint8Array} buffer - The buffer to convert.
+ * @returns {string} - The resulting string.
  */
-function bufferToString(buf) {
-    return Buffer.from(buf).toString();
+function bufferToString(buffer) {
+  return new TextDecoder().decode(buffer);
 }
 
 /**
- * Converts a buffer to a Base64 string which can be used as a key in a map and
- * can be easily serialized.
- * @param {BufferSource} buf - A buffer-like object
- * @returns {string} A Base64 string representing the bytes in the buffer
+ * Encodes a buffer to a Base64 string.
+ *
+ * @param {Uint8Array} buffer - The buffer to encode.
+ * @returns {string} - The Base64 encoded string.
  */
-function encodeBuffer(buf) {
-    return Buffer.from(buf).toString('base64');
+function encodeBuffer(buffer) {
+  return Buffer.from(buffer).toString("base64");
 }
 
 /**
- * Converts a Base64 string back into a buffer
- * @param {string} base64 - A Base64 string representing a buffer
- * @returns {Buffer} A Buffer object
+ * Decodes a Base64 string to a buffer.
+ *
+ * @param {string} str - The Base64 string to decode.
+ * @returns {Uint8Array} - The resulting buffer.
  */
-function decodeBuffer(base64) {
-    return Buffer.from(base64, "base64")
+function decodeBuffer(str) {
+  return new Uint8Array(Buffer.from(str, "base64"));
 }
 
 /**
- * Generates a buffer of random bytes
- * @param {number} len - The number of random bytes
- * @returns {Uint8Array} A buffer of `len` random bytes
+ * Generates random bytes.
+ *
+ * @param {number} length - The number of random bytes to generate.
+ * @returns {Uint8Array} - The random bytes.
  */
-function getRandomBytes(len) {
-    return getRandomValues(new Uint8Array(len))
+function getRandomBytes(length) {
+  return crypto.getRandomValues(new Uint8Array(length));
 }
 
 module.exports = {
-    stringToBuffer,
-    bufferToString,
-    encodeBuffer,
-    decodeBuffer,
-    getRandomBytes
-}
+  stringToBuffer,
+  bufferToString,
+  encodeBuffer,
+  decodeBuffer,
+  getRandomBytes,
+};

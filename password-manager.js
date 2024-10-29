@@ -1,14 +1,17 @@
+// password-manager.js
+
 "use strict";
 
 /********* External Imports ********/
-
-const { stringToBuffer, bufferToString, encodeBuffer, decodeBuffer, getRandomBytes } = require("./lib");
-const { subtle } = require('crypto').webcrypto;
+const { initKeychain } = require("./src/init");
+const { loadKeychain } = require("./src/load"); // To be implemented
+const { dumpKeychain } = require("./src/dump"); // To be implemented
+const { setEntry } = require("./src/set");       // To be implemented
+const { getEntry } = require("./src/get");       // To be implemented
+const { removeEntry } = require("./src/remove"); // To be implemented
 
 /********* Constants ********/
-
-const PBKDF2_ITERATIONS = 100000; // number of iterations for PBKDF2 algorithm
-const MAX_PASSWORD_LENGTH = 64;   // we can assume no password is longer than this many characters
+const MAX_PASSWORD_LENGTH = 64; // Maximum allowed password length
 
 /********* Implementation ********/
 class Keychain {
@@ -20,28 +23,21 @@ class Keychain {
    *  You may design the constructor with any parameters you would like. 
    * Return Type: void
    */
-  constructor() {
-    this.data = { 
-      /* Store member variables that you intend to be public here
-         (i.e. information that will not compromise security if an adversary sees) */
-    };
-    this.secrets = {
-      /* Store member variables that you intend to be private here
-         (information that an adversary should NOT see). */
-    };
-
-    throw "Not Implemented!";
-  };
+  constructor(data, secrets) {
+    this.data = data;       // Public data (safe to serialize)
+    this.secrets = secrets; // Private data (HMAC and AES keys)
+  }
 
   /** 
     * Creates an empty keychain with the given password.
     *
     * Arguments:
     *   password: string
-    * Return Type: void
+    * Return Type: Keychain
     */
   static async init(password) {
-    throw "Not Implemented!";
+    const keychain = await initKeychain(password);
+    return new Keychain(keychain.data, keychain.secrets);
   }
 
   /**
@@ -62,8 +58,9 @@ class Keychain {
     * Return Type: Keychain
     */
   static async load(password, repr, trustedDataCheck) {
-    throw "Not Implemented!";
-  };
+    const keychain = await loadKeychain(password, repr, trustedDataCheck);
+    return new Keychain(keychain.data, keychain.secrets);
+  }
 
   /**
     * Returns a JSON serialization of the contents of the keychain that can be 
@@ -78,8 +75,9 @@ class Keychain {
     * Return Type: array
     */ 
   async dump() {
-    throw "Not Implemented!";
-  };
+    const [repr, checksum] = await dumpKeychain(this.data, this.secrets);
+    return [repr, checksum];
+  }
 
   /**
     * Fetches the data (as a string) corresponding to the given domain from the KVS.
@@ -88,11 +86,14 @@ class Keychain {
     *
     * Arguments:
     *   name: string
-    * Return Type: Promise<string>
+    * Return Type: Promise<string|null>
     */
   async get(name) {
-    throw "Not Implemented!";
-  };
+    if (typeof name !== "string") {
+      throw "Domain name must be a string.";
+    }
+    return await getEntry(this.data, this.secrets, name);
+  }
 
   /** 
   * Inserts the domain and associated data into the KVS. If the domain is
@@ -105,8 +106,14 @@ class Keychain {
   * Return Type: void
   */
   async set(name, value) {
-    throw "Not Implemented!";
-  };
+    if (typeof name !== "string" || typeof value !== "string") {
+      throw "Domain name and password must be strings.";
+    }
+    if (value.length > MAX_PASSWORD_LENGTH) {
+      throw "Password exceeds maximum length.";
+    }
+    await setEntry(this.data, this.secrets, name, value);
+  }
 
   /**
     * Removes the record with name from the password manager. Returns true
@@ -117,8 +124,11 @@ class Keychain {
     * Return Type: Promise<boolean>
   */
   async remove(name) {
-    throw "Not Implemented!";
-  };
-};
+    if (typeof name !== "string") {
+      throw "Domain name must be a string.";
+    }
+    return await removeEntry(this.data, this.secrets, name);
+  }
+}
 
-module.exports = { Keychain }
+module.exports = { Keychain };

@@ -1,3 +1,5 @@
+// test/test-password-manager.js
+
 "use strict";
 
 let expect = require('expect.js');
@@ -10,7 +12,7 @@ function expectReject(promise) {
     );
 }
 
-describe('Password manager', async function() {
+describe('Password manager', function() { // Removed 'async' from describe
     this.timeout(5000);
     let password = "password123!";
 
@@ -20,7 +22,7 @@ describe('Password manager', async function() {
         "service3": "value3"
     };
 
-    describe('functionality', async function() {
+    describe('functionality', function() { // Removed 'async' from describe
 
         it('inits without an error', async function() {
             await Keychain.init(password);
@@ -80,7 +82,7 @@ describe('Password manager', async function() {
             let newKeychain = await Keychain.load(password, contents, checksum);
 
             // Make sure it's valid JSON
-            expect(async function() {
+            expect(() => {
                 JSON.parse(contents)
             }).not.to.throwException();
             for (let k in kvs) {
@@ -111,7 +113,7 @@ describe('Password manager', async function() {
         });
     });
 
-    describe('security', async function() {
+    describe('security', function() { // Removed 'async' from describe
 
         // Very basic test to make sure you're not doing the most naive thing
         it("doesn't store domain names and passwords in the clear", async function() {
