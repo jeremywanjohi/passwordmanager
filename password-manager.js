@@ -1,9 +1,9 @@
+// password-manager.js
 const { initKeychain } = require('./src/init');
 const { setEntry } = require('./src/set');
 const { getEntry } = require('./src/get');
 const { dumpKeychain } = require('./src/dump');
-const { loadKeychain } = require('./src/load');
-const { hmacDomain } = require('./src/utils/hashing');
+// ... other imports as modules are implemented
 
 class Keychain {
     constructor() {
@@ -27,8 +27,7 @@ class Keychain {
      * @param {string} password 
      */
     async set(domain, password) {
-        const domainHMAC = hmacDomain(domain);
-        await setEntry(domainHMAC, password);
+        await setEntry(domain, password);
     }
 
     /**
@@ -37,8 +36,7 @@ class Keychain {
      * @returns {string} - The decrypted password.
      */
     async get(domain) {
-        const domainHMAC = hmacDomain(domain);
-        return await getEntry(domainHMAC);
+        return await getEntry(domain);
     }
 
     /**
@@ -49,32 +47,7 @@ class Keychain {
         await dumpKeychain(filepath);
     }
 
-    /**
-     * Loads the keychain from a specified file.
-     * @param {string} filepath 
-     */
-    async load(filepath) {
-        const { key, salt } = await loadKeychain(filepath);
-        this.key = key;
-        this.salt = salt;
-    }
-
-    /**
-     * Removes an entry for a given domain.
-     * @param {string} domain 
-     */
-    async remove(domain) {
-        const domainHMAC = hmacDomain(domain);
-        await removeEntry(domainHMAC);
-    }
-
-    /**
-     * Lists all domains stored in the keychain.
-     * @returns {Array<string>} - List of domains.
-     */
-    async listDomains() {
-        return await listAllEntries();
-    }
+    // Placeholder for other methods (load, remove)
 }
 
 module.exports = Keychain;

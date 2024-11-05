@@ -1,25 +1,27 @@
- // src/utils/checksum.js
-
+// src/utils/checksum.js
 const crypto = require('crypto');
 
 /**
- * Generates a SHA-256 checksum for given data.
+ * Creates a SHA-256 checksum of the given data.
  * @param {string} data - The data to checksum.
  * @returns {string} - The hexadecimal representation of the checksum.
  */
-function generateChecksum(data) {
+function createChecksum(data) {
     return crypto.createHash('sha256').update(data).digest('hex');
 }
 
 /**
- * Verifies the checksum of the given data.
- * @param {string} data - The original data.
- * @param {string} checksum - The checksum to verify against.
- * @returns {boolean} - True if checksum matches, else false.
+ * Verifies that the checksum matches the data.
+ * @param {string} data - The data to verify.
+ * @param {string} checksum - The expected checksum.
+ * @returns {boolean} - True if the checksum matches, false otherwise.
  */
 function verifyChecksum(data, checksum) {
-    const generatedChecksum = generateChecksum(data);
-    return generatedChecksum === checksum;
+    const calculated = createChecksum(data);
+    return calculated === checksum;
 }
 
-module.exports = { generateChecksum, verifyChecksum };
+module.exports = {
+    createChecksum,
+    verifyChecksum
+};
