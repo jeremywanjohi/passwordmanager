@@ -1,34 +1,32 @@
 // src/load.js
+
 const fs = require('fs').promises;
-const { verifyChecksum } = require('./utils/checksum');
-const { setEntry } = require('./set');
-const KeyValueStore = require('./utils/kvs');
+const { set } = require('./utils/kvs');
+const { createChecksum } = require('./utils/checksum');
+const { getMasterKey } = require('./init');
+const { hmacDomain } = require('./utils/hashing');
 
-/**
- * Loads the keychain data from a JSON file.
- * @param {string} filepath - The path to the input file.
- */
 async function loadKeychain(filepath) {
-    const fileContent = await fs.readFile(filepath, 'utf8');
-    const dumpData = JSON.parse(fileContent);
+    try {
+        const data = await fs.readFile(filepath, 'utf8');
+        const { checksum, data: entries } = JSON.parse(data);
 
-    const { checksum, data } = dumpData;
+        // Verify checksum
+        const dataString = JSON.stringify(entries);
+        const calculatedChecksum = createChecksum(dataString);
+        if (checksum !== calculatedChecksum) {
+            throw new Error('Checksum verification failed');
+        }
 
-    const serializedData = JSON.stringify(data);
-    const isValid = verifyChecksum(serializedData, checksum);
-
-    if (!isValid) {
-        throw new Error('Checksum verification failed. Data may be corrupted.');
+        // Load entries into KVS
+        for (const domainHMAC in entries) {
+            const entry = entries[domainHMAC];
+            set(domainHMAC, entry);
+        }
+    } catch (error) {
+        console.error('Error in loadKeychain:', error);
+        throw error;
     }
-
-    // Clear existing KVS and load new entries
-    KeyValueStore.getInstance().clear();
-
-    for (const [domainHMAC, entry] of Object.entries(data)) {
-        KeyValueStore.getInstance().set(domainHMAC, entry);
-    }
-
-    // Optionally, handle protection against record count leakage here
 }
 
 module.exports = {

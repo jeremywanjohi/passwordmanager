@@ -1,39 +1,56 @@
-const { expect } = require('expect.js');
-const { setEntry } = require('../src/set');
-const { initKeychain } = require('../src/init');
-const KeyValueStore = require('../src/utils/kvs'); // Assuming a KVS module
+// test/set.test.js
+const { expect } = require('chai'); // Correct import
+const { setEntry } = require('../src/set'); // Correct import path
+const { getEntry } = require('../src/get'); // Correct import path
+const { clear } = require('../src/utils/kvs'); // Correct import path
+const { hmacDomain } = require('../src/utils/hashing'); // Correct import
+const { getMasterKey } = require('../src/init'); // Correct import
+const crypto = require('crypto');
+const { unpadPassword } = require('../src/utils/padding');
+const { get } = require('../src/utils/kvs');
 
-describe('Set Module', () => {
-    before(async () => {
-        await initKeychain('TestMasterPassword');
+
+describe("Set Module", () => {
+    before(() => {
+        // Clear KVS before tests
+        clear();
     });
 
-    it('should set an entry with encrypted password', async () => {
-        const domain = 'example.com';
-        const password = 'SecurePassword!@#';
-        
-        await setEntry(domain, password);
-        
-        const hmacDomainName = KeyValueStore.hmacDomain(domain);
-        const entry = KeyValueStore.get(hmacDomainName);
-        
-        expect(entry).to.have.property('iv');
-        expect(entry).to.have.property('authTag');
-        expect(entry).to.have.property('password');
+    after(() => {
+        // Clean up after tests
+        clear();
     });
 
-    it('should pad the password to fixed length', async () => {
-        const domain = 'short.com';
-        const password = 'short';
-        
-        await setEntry(domain, password);
-        
-        const entry = KeyValueStore.get(KeyValueStore.hmacDomain(domain));
-        const encryptedPassword = entry.password;
-        
-        // Decrypt to verify padding (assuming decryption is implemented)
-        // This is a placeholder for actual decryption verification
-        // const decrypted = decrypt(encryptedPassword, entry.iv, entry.authTag);
-        // expect(decrypted.length).to.be(32);
+    it("should set an entry with encrypted password", () => {
+        setEntry('example.com', 'password123');
+        const hmac = hmacDomain('example.com', getMasterKey());
+        const storedEntry = get(hmac);
+    
+        expect(storedEntry).to.be.an('object').that.has.all.keys('iv', 'authTag', 'ciphertext');
     });
+    it("should pad the password to fixed length", () => {
+        setEntry('test.com', 'pass');
+        const hmac = hmacDomain('test.com', getMasterKey());
+        const storedEntry = get(hmac);
+    
+        // Verify that all necessary fields are present
+        expect(storedEntry).to.have.property('iv').that.is.a('string');
+        expect(storedEntry).to.have.property('authTag').that.is.a('string');
+        expect(storedEntry).to.have.property('ciphertext').that.is.a('string');
+    
+        // Proceed with decryption
+        const decipher = crypto.createDecipheriv(
+            'aes-256-gcm',
+            getMasterKey(),
+            Buffer.from(storedEntry.iv, 'hex')
+        );
+        decipher.setAuthTag(Buffer.from(storedEntry.authTag, 'hex'));
+        let decrypted = decipher.update(storedEntry.ciphertext, 'hex', 'utf8');
+        decrypted += decipher.final('utf8');
+        const originalPassword = unpadPassword(decrypted);
+    
+        expect(originalPassword).to.equal('pass');
+        expect(decrypted).to.have.lengthOf(32); // Padded length
+    });
+    
 });

@@ -13,8 +13,10 @@
     "dotenv": "^16.4.5"
   },
   "devDependencies": {
+    "chai": "^4.3.7",
     "eslint": "^8.0.0",
     "expect.js": "^0.3.1",
-    "mocha": "^10.7.3"
+    "mocha": "^10.7.3",
+    "proxyquire": "^2.1.3"
   }
 }

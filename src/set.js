@@ -1,42 +1,42 @@
+// src/set.js
 const crypto = require('crypto');
-const { getCachedKey } = require('./init');
+const { set } = require('./utils/kvs');
 const { hmacDomain } = require('./utils/hashing');
-const { padPassword } = require('./utils/encryption');
-
-const PASSWORD_LENGTH = 32; // Fixed password length after padding
+const { padPassword } = require('./utils/padding');
+const { getMasterKey } = require('./init');
 
 /**
- * Sets a password entry for a given domain.
+ * Sets an entry with an encrypted password.
  * @param {string} domain - The domain name.
- * @param {string} password - The password to store.
+ * @param {string} password - The plaintext password.
  */
-async function setEntry(domain, password) {
-    const key = getCachedKey();
-    if (!key) {
-        throw new Error('Keychain not initialized');
+function setEntry(domain, password) {
+    if (typeof domain !== 'string' || typeof password !== 'string') {
+        throw new Error('Domain and password must be strings.');
     }
 
-    const iv = crypto.randomBytes(12); // AES-GCM standard IV size
-    const hmacDomainName = hmacDomain(domain);
+    // Generate HMAC for the domain using the master key
+    const domainHMAC = hmacDomain(domain, getMasterKey());
 
-    const paddedPassword = padPassword(password, PASSWORD_LENGTH);
+    // Pad the password to a fixed length (e.g., 32 characters)
+    const paddedPassword = padPassword(password, 32); // Ensure padPassword accepts length as second argument
 
-    const cipher = crypto.createCipheriv('aes-256-gcm', key, iv);
+    // Encrypt the padded password using AES-GCM
+    const iv = crypto.randomBytes(12); // 96-bit IV for AES-GCM
+    const cipher = crypto.createCipheriv('aes-256-gcm', getMasterKey(), iv);
     let encrypted = cipher.update(paddedPassword, 'utf8', 'hex');
     encrypted += cipher.final('hex');
     const authTag = cipher.getAuthTag().toString('hex');
 
-    // Store the encrypted password along with IV and auth tag
-    const entry = {
+    // Store the encrypted password along with IV and authTag
+    const encryptedPassword = {
         iv: iv.toString('hex'),
         authTag,
-        password: encrypted
+        ciphertext: encrypted
     };
 
-    // Initialize or update the Key-Value Store (KVS)
-    // This is a placeholder; actual KVS implementation may vary
-    const kvs = KeyValueStore.getInstance();
-    kvs.set(hmacDomainName, entry);
+    // Set the entry in the Key-Value Store
+    set(domainHMAC, encryptedPassword);
 }
 
 module.exports = {

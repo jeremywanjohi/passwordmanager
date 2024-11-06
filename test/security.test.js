@@ -1,7 +1,6 @@
- // test/security.test.js
-
-const expect = require('expect.js');
-const { generateDummyHMAC } = require('../src/utils/security');
+// test/security.test.js
+const { expect } = require('chai');
+const { createChecksum, verifyChecksum } = require('../src/utils/checksum');
 const { hmacDomain } = require('../src/utils/hashing');
 const crypto = require('crypto');
 
@@ -19,7 +18,7 @@ describe('Security Defenses', function() {
         it('should not allow reverse engineering of domain names from HMACs', function() {
             const domain = 'secure.com';
             const hmac = hmacDomain(domain, key);
-            // Attempting to reverse engineer is not feasible; ensure HMAC is not equal to domain
+            // Ensure HMAC is not equal to domain
             expect(hmac).to.not.equal(domain);
         });
 
@@ -33,18 +32,17 @@ describe('Security Defenses', function() {
     });
 
     describe('Rollback Attack Defense', function() {
-        it('should verify checksum and detect tampering', async function() {
-            const { generateChecksum, verifyChecksum } = require('../src/utils/checksum');
+        it('should verify checksum and detect tampering', function() {
             const data = '{"example.com":"password123"}';
-            const validChecksum = generateChecksum(data);
+            const validChecksum = createChecksum(data);
             const tamperedData = '{"example.com":"password1234"}';
-            const tamperedChecksum = generateChecksum(tamperedData);
+            const tamperedChecksum = createChecksum(tamperedData);
 
             // Valid checksum should pass
-            expect(verifyChecksum(data, validChecksum)).to.be(true);
+            expect(verifyChecksum(data, validChecksum)).to.be.true;
 
             // Tampered checksum should fail
-            expect(verifyChecksum(data, tamperedChecksum)).to.be(false);
+            expect(verifyChecksum(data, tamperedChecksum)).to.be.false;
         });
     });
 });

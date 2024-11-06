@@ -27,8 +27,30 @@ function initKeychain(masterPassword) {
     }
 }
 
+/**
+ * Retrieves the cached master key.
+ * @returns {Buffer} The master key.
+ */
+function getMasterKey() {
+    if (!cachedKey) {
+        throw new Error("Master key not initialized.");
+    }
+    return cachedKey;
+}
+
+/**
+ * Retrieves the cached salt.
+ * @returns {Buffer} The salt.
+ */
+function getCachedSalt() {
+    if (!cachedSalt) {
+        throw new Error("Salt not initialized.");
+    }
+    return cachedSalt;
+}
+
 module.exports = {
     initKeychain,
-    getCachedKey: () => cachedKey,
-    getCachedSalt: () => cachedSalt
+    getMasterKey,
+    getCachedSalt
 };

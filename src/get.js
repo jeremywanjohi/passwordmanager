@@ -1,43 +1,43 @@
+// src/get.js
 const crypto = require('crypto');
-const { getCachedKey } = require('./init');
+const { get } = require('./utils/kvs');
 const { hmacDomain } = require('./utils/hashing');
-const { unpadPassword } = require('./utils/encryption');
-
-const PASSWORD_LENGTH = 32; // Fixed password length after padding
+const { unpadPassword } = require('./utils/padding');
+const { getMasterKey } = require('./init'); // Correctly import getMasterKey
 
 /**
- * Retrieves and decrypts a password entry for a given domain.
+ * Retrieves and decrypts the password for a given domain.
  * @param {string} domain - The domain name.
- * @returns {Promise<string>} - The decrypted password.
+ * @returns {string} The decrypted password.
  */
-async function getEntry(domain) {
-    const key = getCachedKey();
-    if (!key) {
-        throw new Error('Keychain not initialized');
+function getEntry(domain) {
+    if (typeof domain !== 'string') {
+        throw new Error('Domain must be a string.');
     }
 
-    const hmacDomainName = hmacDomain(domain);
-    const kvs = KeyValueStore.getInstance();
-    const entry = kvs.get(hmacDomainName);
+    // Generate HMAC for the domain using the master key
+    const domainHMAC = hmacDomain(domain, getMasterKey());
 
-    if (!entry) {
-        throw new Error('No entry found for the specified domain');
+    // Retrieve the encrypted password from KVS
+    const encryptedPassword = get(domainHMAC);
+    if (!encryptedPassword) {
+        throw new Error('Domain does not exist');
     }
 
-    const iv = Buffer.from(entry.iv, 'hex');
-    const authTag = Buffer.from(entry.authTag, 'hex');
-    const encryptedPassword = entry.password;
+    const { iv, authTag, ciphertext } = encryptedPassword;
 
-    const decipher = crypto.createDecipheriv('aes-256-gcm', key, iv);
-    decipher.setAuthTag(authTag);
-
-    let decrypted = decipher.update(encryptedPassword, 'hex', 'utf8');
+    // Decrypt the password using AES-GCM
+    const decipher = crypto.createDecipheriv('aes-256-gcm', getMasterKey(), Buffer.from(iv, 'hex'));
+    decipher.setAuthTag(Buffer.from(authTag, 'hex'));
+    let decrypted = decipher.update(ciphertext, 'hex', 'utf8');
     decrypted += decipher.final('utf8');
 
+    // Unpad the decrypted password
     const unpaddedPassword = unpadPassword(decrypted);
+
     return unpaddedPassword;
 }
 
 module.exports = {
     getEntry
-}; 
+};

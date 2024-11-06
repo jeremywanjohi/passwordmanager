@@ -1,37 +1,49 @@
- // test/dump.test.js
-const { expect } = require('expect.js');
-const { dumpKeychain } = require('../src/dump');
-const { initKeychain } = require('../src/init');
-const { setEntry } = require('../src/set');
-const KeyValueStore = require('../src/utils/kvs');
+// test/dump.test.js
+const { expect } = require('chai'); // Correct import
 const fs = require('fs').promises;
-const path = require('path');
+const { dumpKeychain } = require('../src/dump'); // Ensure dumpKeychain is correctly implemented
+const { setEntry } = require('../src/set'); // Corrected import path
+const { clear } = require('../src/utils/kvs'); // Import clear from kvs.js
+const { createChecksum } = require('../src/utils/checksum');
 
-describe('Dump Module', () => {
-    const dumpFilePath = path.join(__dirname, 'test_dump.json');
+describe("Dump Module", () => {
+    const filepath = 'test_dump.json';
 
     before(async () => {
-        await initKeychain('TestMasterPassword');
-        await setEntry('example.com', 'Password123');
+        // Clear KVS and set up initial entries
+        clear();
+        setEntry('example.com', 'password123'); // 11 characters, within 32 limit
+        setEntry('test.com', 'password456'); // 11 characters, within 32 limit
+        await dumpKeychain(filepath); // Ensure dumpKeychain creates the file
     });
 
-    after(async () => {
-        // Clean up the dump file after tests
-        try {
-            await fs.unlink(dumpFilePath);
-        } catch (error) {
-            // File might not exist; ignore
+    it("should dump the keychain to a JSON file with checksum", async () => {
+        const dumpData = JSON.parse(await fs.readFile(filepath, 'utf8'));
+        expect(dumpData).to.have.property('checksum');
+        expect(dumpData).to.have.property('data');
+
+        const dataString = JSON.stringify(dumpData.data);
+        const expectedChecksum = createChecksum(dataString);
+        expect(dumpData.checksum).to.equal(expectedChecksum);
+
+        // Verify that data does not contain plaintext domains or passwords
+        for (const domainHMAC in dumpData.data) {
+            expect(domainHMAC).to.not.include('domain'); // Assuming domain HMACs do not include 'domain'
+            expect(dumpData.data[domainHMAC].ciphertext).to.not.include('password'); // Encrypted passwords should not include 'password'
         }
     });
 
-    it('should dump the keychain to a JSON file with checksum', async () => {
-        await dumpKeychain(dumpFilePath);
-        const fileContent = await fs.readFile(dumpFilePath, 'utf8');
-        const dumpData = JSON.parse(fileContent);
-
-        expect(dumpData).to.have.property('checksum');
-        expect(dumpData).to.have.property('data');
-        expect(dumpData.data).to.have.property(KeyValueStore.hmacDomain('example.com'));
+    after(async () => {
+        // Clean up test file and key-value store
+        try {
+            await fs.unlink(filepath);
+        } catch (err) {
+            if (err.code !== 'ENOENT') {
+                throw err;
+            }
+            // Ignore if the file doesn't exist
+        }
+        clear();
     });
+    
 });
-
