@@ -3,6 +3,7 @@ const { initKeychain } = require('./src/init');
 const { setEntry } = require('./src/set');
 const { getEntry } = require('./src/get');
 const { dumpKeychain } = require('./src/dump');
+const { loadKeychain } = require('./src/load');
 // ... other imports as modules are implemented
 
 class Keychain {
@@ -47,7 +48,15 @@ class Keychain {
         await dumpKeychain(filepath);
     }
 
-    // Placeholder for other methods (load, remove)
+    /**
+     * Loads the keychain from a specified file.
+     * @param {string} filepath 
+     */
+    async load(filepath) {
+        await loadKeychain(filepath);
+    }
+
+    // Placeholder for other methods (remove)
 }
 
 module.exports = Keychain;

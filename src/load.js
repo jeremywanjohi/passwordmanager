@@ -1,37 +1,36 @@
- 
 // src/load.js
-
 const fs = require('fs').promises;
-const path = require('path');
 const { verifyChecksum } = require('./utils/checksum');
-
-// Path to the keychain storage file
-const KEYCHAIN_PATH = path.join(__dirname, '../keychain.json');
-const CHECKSUM_PATH = path.join(__dirname, '../checksum.txt');
+const { setEntry } = require('./set');
+const KeyValueStore = require('./utils/kvs');
 
 /**
- * Loads the keychain from a specified file after verifying checksum.
- * @param {string} filepath 
- * @returns {Object} - The loaded keychain data.
+ * Loads the keychain data from a JSON file.
+ * @param {string} filepath - The path to the input file.
  */
 async function loadKeychain(filepath) {
-    try {
-        const [data, checksum] = await Promise.all([
-            fs.readFile(filepath, 'utf-8'),
-            fs.readFile(CHECKSUM_PATH, 'utf-8')
-        ]);
+    const fileContent = await fs.readFile(filepath, 'utf8');
+    const dumpData = JSON.parse(fileContent);
 
-        if (!verifyChecksum(data, checksum.trim())) {
-            throw new Error('Checksum verification failed. Possible rollback attack detected.');
-        }
+    const { checksum, data } = dumpData;
 
-        const keychain = JSON.parse(data);
-        // Extract key and salt if stored
-        return keychain;
-    } catch (error) {
-        console.error('Error loading keychain:', error);
-        throw error;
+    const serializedData = JSON.stringify(data);
+    const isValid = verifyChecksum(serializedData, checksum);
+
+    if (!isValid) {
+        throw new Error('Checksum verification failed. Data may be corrupted.');
     }
+
+    // Clear existing KVS and load new entries
+    KeyValueStore.getInstance().clear();
+
+    for (const [domainHMAC, entry] of Object.entries(data)) {
+        KeyValueStore.getInstance().set(domainHMAC, entry);
+    }
+
+    // Optionally, handle protection against record count leakage here
 }
 
-module.exports = { loadKeychain };
+module.exports = {
+    loadKeychain
+};
