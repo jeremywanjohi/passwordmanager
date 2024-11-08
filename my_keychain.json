@@ -1,0 +1,10 @@
+{
+  "checksum": "9432eaad698b378413414453362f4f0fed07b2ed9114907591fa1bcb2f278183",
+  "data": {
+    "4347dd82aba5e119143d61e50b340451c99222f7af968429e08ebfcb043be7e2": {
+      "iv": "9bea758d1369a0d079e18c08",
+      "authTag": "2e36f1b4b3bcba4584a5f886ac95aa48",
+      "ciphertext": "04ba94897d673ae54cf9779ed9bed299ae4cb65f9d16b73902bae97723fc03ef"
+    }
+  }
+}

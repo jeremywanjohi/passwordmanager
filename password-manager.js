@@ -1,10 +1,12 @@
 // password-manager.js
+
 const { initKeychain } = require('./src/init');
 const { setEntry } = require('./src/set');
 const { getEntry } = require('./src/get');
 const { dumpKeychain } = require('./src/dump');
 const { loadKeychain } = require('./src/load');
-// ... other imports as modules are implemented
+const { removeEntry } = require('./src/remove'); // Ensure this exists
+const { clear } = require('./src/utils/kvs'); // Ensure this exists
 
 class Keychain {
     constructor() {
@@ -41,6 +43,14 @@ class Keychain {
     }
 
     /**
+     * Removes the password for a given domain.
+     * @param {string} domain 
+     */
+    async remove(domain) {
+        await removeEntry(domain);
+    }
+
+    /**
      * Dumps the keychain to a specified file.
      * @param {string} filepath 
      */
@@ -56,7 +66,12 @@ class Keychain {
         await loadKeychain(filepath);
     }
 
-    // Placeholder for other methods (remove)
+    /**
+     * Clears the in-memory key-value store.
+     */
+    clear() {
+        clear();
+    }
 }
 
 module.exports = Keychain;
