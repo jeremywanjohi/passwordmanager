@@ -108,12 +108,8 @@ To start the CLI, navigate to your project directory in the terminal and run:
   npm start `
 
 -   **Directly with Node.js:**
-
-    bash
-
-    Copy code
-
-    `node cli.js`
+  ```bash
+  node cli.js`
 
 #### Initial Setup
 
@@ -125,9 +121,8 @@ To start the CLI, navigate to your project directory in the terminal and run:
         -   Minimum of 6 characters.
         -   Should be strong and unique for maximum security.
 
-    bash
+    ```bash
 
-    Copy code
 
     `Welcome to the Secure Password Manager CLI
     ? Create a master password: ********
@@ -138,10 +133,8 @@ To start the CLI, navigate to your project directory in the terminal and run:
 
     If a keychain already exists, you'll be prompted to enter your master password to access your stored passwords.
 
-    bash
-
-    Copy code
-
+    ```bash
+   
     `Welcome to the Secure Password Manager CLI
     ? Enter your master password: ********
     Keychain loaded successfully.`
@@ -152,7 +145,7 @@ After initialization, you'll see a menu with the following options:
 
 plaintext
 
-Copy code
+
 
 `? Select an action:
 ❯ Add a password
