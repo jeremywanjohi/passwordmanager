@@ -54,104 +54,79 @@ main();
 
 ```
 
-### Basic Operations
+## Basic Operations
 
-1\. **Set a Password**:
+- **Set a Password**:
+    ```javascript
+    await keychain.set('example.com', 'password123');
+    ```
 
-    ```javascript
-    await keychain.set('example.com', 'password123');
-    ```
+- **Get a Password**:
+    ```javascript
+    const password = await keychain.get('example.com');
+    console.log(password); // Outputs: password123
+    ```
 
-2\. **Get a Password**:
+- **Remove a Password**:
+    ```javascript
+    await keychain.remove('example.com');
+    ```
 
-    ```javascript
-    const password = await keychain.get('example.com');
-    console.log(password); // Outputs: password123
-    ```
+- **Dump Keychain Data to a File**:
+    ```javascript
+    await keychain.dump('passwords.json');
+    ```
 
-3\. **Remove a Password**:
-
-    ```javascript
-    await keychain.remove('example.com');
-    ```
-
-4\. **Dump Keychain Data to a File**:
-
-    ```javascript
-    await keychain.dump('passwords.json');
-    ```
-
-5\. **Load Keychain Data from a File**:
-
-    ```javascript
-    await keychain.load('passwords.json');
-    ```
+- **Load Keychain Data from a File**:
+    ```javascript
+    await keychain.load('passwords.json');
+    ```
 
 ## Security
 
 This project is built with security as a primary focus:
 
 - **Encryption**: All passwords are encrypted with AES-GCM, a modern and secure encryption algorithm.
-
 - **Integrity**: An HMAC is used to verify that the data has not been tampered with.
-
 - **Salted Key Derivation**: PBKDF2 with a random salt is used to derive keys from the master password, adding resistance against brute-force attacks.
 
 ## Testing
 
 Unit tests are provided in the `test/test-password-manager.js` file. To run the tests:
 
-1\. **Install Testing Libraries**:
+1. **Install Testing Libraries**:
+    ```bash
+    npm install expect.js
+    ```
 
-    ```bash
-
-    npm install expect.js
-
-    ```
-
-2\. **Run Tests**:
-
-    ```bash
-
-    npm test
-
-    ```
+2. **Run Tests**:
+    ```bash
+    npm test
+    ```
 
 The tests check various functionalities, including:
 
 - Initialization and HMAC verification
-
 - CRUD operations for passwords
-
 - Data dumping and loading
-
 - Integrity checks to detect tampering
-
 
 ## Security Discussion Questions
 
-1\. **Preventing Adversary Access to Password Lengths**:  
+1. **Preventing Adversary Access to Password Lengths**:  
+   To prevent adversaries from learning password lengths, we apply fixed-length encryption padding. This approach ensures that all encrypted data appears to have uniform length, making it difficult to infer the actual lengths of stored passwords based on ciphertext size variations.
 
-   To prevent adversaries from learning password lengths, we apply fixed-length encryption padding. This approach ensures that all encrypted data appears to have uniform length, making it difficult to infer the actual lengths of stored passwords based on ciphertext size variations.
+2. **Preventing Swap Attacks**:  
+   To prevent swap attacks, our scheme utilizes HMAC to verify the integrity of each password entry. Each entry includes an HMAC generated from the data and domain. Since HMACs are deterministic, any attempt to swap data entries would result in HMAC mismatches during verification, thus detecting tampering and preventing successful swap attacks.
 
-2\. **Preventing Swap Attacks**:  
+3. **Defending Against Rollback Attacks**:  
+   Yes, a trusted location is necessary for the defense against rollback attacks. The SHA-256 hash, representing the current state of the password data, must be stored securely to prevent an attacker from modifying or rolling it back alongside the encrypted data. Without a trusted location, an attacker could replace the current hash with an older one, making the rollback attack undetectable.
 
-   To prevent swap attacks, our scheme utilizes HMAC to verify the integrity of each password entry. Each entry includes an HMAC generated from the data and domain. Since HMACs are deterministic, any attempt to swap data entries would result in HMAC mismatches during verification, thus detecting tampering and preventing successful swap attacks.
+4. **Using a Randomized MAC Instead of HMAC**:  
+   Using a randomized MAC would complicate lookups since the MAC output varies with each execution, preventing direct lookups based on MAC values. To handle this, we would need to maintain separate lookup tables or indices that map domain names to their corresponding randomized MACs. This introduces a performance penalty due to increased storage requirements and the additional computational overhead of managing and querying these indices.
 
-3\. **Defending Against Rollback Attacks**:  
+5. **Reducing Information Leakage About Record Counts**:  
+   To minimize information leakage about the number of records, we can use padding and dummy entries to obscure the actual record count. By grouping records into fixed-size batches and adding dummy entries as needed, the system ensures that the number of visible records only reflects the logarithm of the true count (log2(k)). Additionally, data obfuscation techniques can serialize a constant number of batches, maintaining uniformity regardless of the actual record count.
 
-   Yes, a trusted location is necessary for the defense against rollback attacks. The SHA-256 hash, representing the current state of the password data, must be stored securely to prevent an attacker from modifying or rolling it back alongside the encrypted data. Without a trusted location, an attacker could replace the current hash with an older one, making the rollback attack undetectable.
-
-4\. **Using a Randomized MAC Instead of HMAC**:  
-
-   Using a randomized MAC would complicate lookups since the MAC output varies with each execution, preventing direct lookups based on MAC values. To handle this, we would need to maintain separate lookup tables or indices that map domain names to their corresponding randomized MACs. This introduces a performance penalty due to increased storage requirements and the additional computational overhead of managing and querying these indices.
-
-5\. **Reducing Information Leakage About Record Counts**:  
-
-   To minimize information leakage about the number of records, we can use padding and dummy entries to obscure the actual record count. By grouping records into fixed-size batches and adding dummy entries as needed, the system ensures that the number of visible records only reflects the logarithm of the true count (log2(k)). Additionally, data obfuscation techniques can serialize a constant number of batches, maintaining uniformity regardless of the actual record count.
-
-6\. **Implementing Multi-User Support**:  
-
-   To enable multi-user support, we can implement namespace separation and role-based access controls. Each user, such as Alice and Bob, has a unique master key derived from their individual master passwords, ensuring that their private data remains isolated. For shared passwords, such as for nytimes, we assign them to a common namespace accessible only to authorized users. This setup allows Alice and Bob to access and update shared entries without granting them access to each other's private passwords for other websites, thus maintaining security and privacy across individual and shared data.
-
-
+6. **Implementing Multi-User Support**:  
+   To enable multi-user support, we can implement namespace separation and role-based access controls. Each user, such as Alice and Bob, has a unique master key derived from their individual master passwords, ensuring that their private data remains isolated. For shared passwords, such as for nytimes, we assign them to a common namespace accessible only to authorized users. This setup allows Alice and Bob to access and update shared entries without granting them access to each other's private passwords for other websites, thus maintaining security and privacy across individual and shared data.
