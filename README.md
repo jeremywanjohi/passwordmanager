@@ -103,17 +103,10 @@ The Password Manager CLI provides an interactive way to manage your passwords se
 
 To start the CLI, navigate to your project directory in the terminal and run:
 
-- **Using NPM Script:**
+- **Directly with Node.js**
   ```bash
-  npm start `
+  node cli.js `
 
-- **Directly with Node.js:**
-
-  ```bash
-
-  node cli.js
-
-  ```
 
 #### Initial Setup
 
@@ -184,7 +177,6 @@ Use the arrow keys to navigate and press `Enter` to select an option.
      2. Enter the website URL or name.
 
 
-
 3\. **Remove a Password**
 
    - **Purpose:** Delete the password entry for a specific website.
@@ -204,7 +196,6 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      1. Select **"List all websites"** from the main menu.
 
- 
 
 5\. **Exit**
 
@@ -214,7 +205,6 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      1. Select **"Exit"** from the main menu.
 
-```
 
 ## Security
 
