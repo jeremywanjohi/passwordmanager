@@ -19,6 +19,7 @@ This Password Manager is a secure and encrypted system for storing and managing 
 - [Installation](#installation)
 - [Usage](#usage)
   - [Basic Operations](#basic-operations)
+  - [Using the CLI](#using-the-cli)
 - [Security](#security)
 - [Testing](#testing)
 - [Security Discussion Questions](#security-discussion-questions)
