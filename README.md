@@ -59,43 +59,32 @@ main();
 1\. **Set a Password**:
 
     ```javascript
-
     await keychain.set('example.com', 'password123');
-
     ```
 
 2\. **Get a Password**:
 
     ```javascript
-
     const password = await keychain.get('example.com');
-
     console.log(password); // Outputs: password123
-
     ```
 
 3\. **Remove a Password**:
 
     ```javascript
-
     await keychain.remove('example.com');
-
     ```
 
 4\. **Dump Keychain Data to a File**:
 
     ```javascript
-
     await keychain.dump('passwords.json');
-
     ```
 
 5\. **Load Keychain Data from a File**:
 
     ```javascript
-
     await keychain.load('passwords.json');
-
     ```
 
 ## Security
