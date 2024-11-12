@@ -1,83 +1,54 @@
 
 
----
-
 # Password Manager
 
 This Password Manager is a secure and encrypted system for storing and managing passwords for different websites or applications. Built using Node.js and crypto APIs, it leverages AES-GCM encryption and HMAC for data integrity. This project ensures that sensitive data remains secure while being easily accessible when needed.
 
 ## Table of Contents
-
 - [Features](#features)
-
 - [Installation](#installation)
-
 - [Usage](#usage)
-
-  - [Basic Operations](#basic-operations)
-
-  - [Example](#example)
-
+  - [Basic Operations](#basic-operations)
 - [Security](#security)
-
 - [Testing](#testing)
-
 - [Project Structure](#project-structure)
-
 - [Security Discussion Questions](#security-discussion-questions)
-
 - [License](#license)
 
 ## Features
 
 - **Encryption**: Uses AES-GCM to encrypt passwords, ensuring data confidentiality.
-
 - **Data Integrity**: HMAC is used to verify data integrity, detecting tampering or corruption.
-
 - **CRUD Operations**: Supports setting, retrieving, updating, and deleting passwords for different domains.
-
 - **Data Persistence**: Dumps and loads encrypted password data to/from a file.
-
 - **Password-Protected Access**: Uses a master password to initialize the keychain.
 
 ## Installation
 
-1\. **Clone the Repository**:
+1. **Clone the Repository**:
+    ```bash
+    git clone https://github.com/jeremywanjohi/passmanager.git
+    cd passmanager
+    ```
 
-    ```bash
+2. **Install Dependencies**: Make sure Node.js is installed. Then, run:
+    ```bash
+    npm install
+    ```
 
-    git clone https://github.com/jeremywanjohi/passmanager.git
-
-    cd passmanager
-
-    ```
-
-2\. **Install Dependencies**: Make sure Node.js is installed. Then, run:
-
-    ```bash
-
-    npm install
-
-    ```
-
-3\. **Set Up Environment Variables** (optional): If your code relies on environment variables, set them in a `.env` file.
+3. **Set Up Environment Variables** (optional): If your code relies on environment variables, set them in a `.env` file.
 
 ## Usage
 
 ### Initializing the Keychain
 
 To initialize the password manager with a master password:
-
 ```javascript
-
 const Keychain = require('./password-manager');
 
 async function main() {
-
-    const keychain = new Keychain();
-
-    await keychain.init('your-master-password');
-
+    const keychain = new Keychain();
+    await keychain.init('your-master-password');
 }
 
 main();
