@@ -95,7 +95,7 @@ main();
 
 
 
-### Using the CLI
+`### Using the CLI
 
 The Password Manager CLI provides an interactive way to manage your passwords securely.
 
@@ -104,182 +104,142 @@ The Password Manager CLI provides an interactive way to manage your passwords se
 To start the CLI, navigate to your project directory in the terminal and run:
 
 - **Using NPM Script:**
+  ```bash
+  npm start `
 
-  ```bash
-  npm start
-  ```
+-   **Directly with Node.js:**
 
-- **Directly with Node.js:**
+    bash
 
-  ```bash
-  node cli.js
-  ```
+    Copy code
+
+    `node cli.js`
 
 #### Initial Setup
 
-1\. **Create a Master Password:**
+1.  **Create a Master Password:**
 
-   If it's your first time running the CLI, you'll be prompted to create a master password.
+    If it's your first time running the CLI, you'll be prompted to create a master password.
 
-   - **Requirements:**
+    -   **Requirements:**
+        -   Minimum of 6 characters.
+        -   Should be strong and unique for maximum security.
 
-     - Minimum of 6 characters.
+    bash
 
-     - Should be strong and unique for maximum security.
+    Copy code
 
-   ```bash
+    `Welcome to the Secure Password Manager CLI
+    ? Create a master password: ********
+    ? Confirm your master password: ********
+    New keychain created and saved successfully.`
 
-   Welcome to the Secure Password Manager CLI
+2.  **Load Existing Keychain:**
 
-   ? Create a master password: ********
+    If a keychain already exists, you'll be prompted to enter your master password to access your stored passwords.
 
-   ? Confirm your master password: ********
+    bash
 
-   New keychain created and saved successfully.
+    Copy code
 
-   ```
-
-2\. **Load Existing Keychain:**
-
-   If a keychain already exists, you'll be prompted to enter your master password to access your stored passwords.
-
-   ```bash
-
-   Welcome to the Secure Password Manager CLI
-
-   ? Enter your master password: ********
-
-   Keychain loaded successfully.
-
-   ```
+    `Welcome to the Secure Password Manager CLI
+    ? Enter your master password: ********
+    Keychain loaded successfully.`
 
 #### Main Menu
 
 After initialization, you'll see a menu with the following options:
 
-```plaintext
+plaintext
 
-? Select an action:
+Copy code
 
+`? Select an action:
 ❯ Add a password
-
-  Retrieve a password
-
-  Remove a password
-
-  List all websites
-
-  ────────────
-
-  Exit
-
-```
+  Retrieve a password
+  Remove a password
+  List all websites
+  ────────────
+  Exit`
 
 Use the arrow keys to navigate and press `Enter` to select an option.
 
 #### Basic Operations
 
-1\. **Add a Password**
+1.  **Add a Password**
 
-   - **Purpose:** Store a new password for a specific website or application.
+    -   **Purpose:** Store a new password for a specific website or application.
+    -   **Steps:**
+        1.  Select **"Add a password"** from the main menu.
+        2.  Enter the website URL or name.
+        3.  Enter the password.
 
-   - **Steps:**
+    bash
 
-     1. Select **"Add a password"** from the main menu.
+    Copy code
 
-     2. Enter the website URL or name.
+    `? Select an action: Add a password
+    ? Enter the website URL or name: example.com
+    ? Enter the password: ************
+    Password for "example.com" added successfully.`
 
-     3. Enter the password.
+2.  **Retrieve a Password**
 
-   ```bash
+    -   **Purpose:** Fetch the password for a specific website.
+    -   **Steps:**
+        1.  Select **"Retrieve a password"** from the main menu.
+        2.  Enter the website URL or name.
 
-   ? Select an action: Add a password
+    bash
 
-   ? Enter the website URL or name: example.com
+    Copy code
 
-   ? Enter the password: ************
+    `? Select an action: Retrieve a password
+    ? Enter the website URL or name to retrieve the password: example.com
+    Password for "example.com": password123`
 
-   Password for "example.com" added successfully.
+3.  **Remove a Password**
 
-   ```
+    -   **Purpose:** Delete the password entry for a specific website.
+    -   **Steps:**
+        1.  Select **"Remove a password"** from the main menu.
+        2.  Enter the website URL or name.
 
-2\. **Retrieve a Password**
+    bash
 
-   - **Purpose:** Fetch the password for a specific website.
+    Copy code
 
-   - **Steps:**
+    `? Select an action: Remove a password
+    ? Enter the website URL or name to remove the password: example.com
+    Password for "example.com" removed successfully.`
 
-     1. Select **"Retrieve a password"** from the main menu.
+4.  **List All Websites**
 
-     2. Enter the website URL or name.
+    -   **Purpose:** Display all websites for which passwords are stored.
+    -   **Steps:**
+        1.  Select **"List all websites"** from the main menu.
 
-   ```bash
+    bash
 
-   ? Select an action: Retrieve a password
+    Copy code
 
-   ? Enter the website URL or name to retrieve the password: example.com
+    `? Select an action: List all websites
+    Stored Websites:
+    1. example.com
+    2. testsite.com`
 
-   Password for "example.com": password123
+5.  **Exit**
 
-   ```
+    -   **Purpose:** Safely exit the application.
+    -   **Steps:**
+        1.  Select **"Exit"** from the main menu.
 
-3\. **Remove a Password**
+    bash
 
-   - **Purpose:** Delete the password entry for a specific website.
+    Copy code
 
-   - **Steps:**
-
-     1. Select **"Remove a password"** from the main menu.
-
-     2. Enter the website URL or name.
-
-   ```bash
-
-   ? Select an action: Remove a password
-
-   ? Enter the website URL or name to remove the password: example.com
-
-   Password for "example.com" removed successfully.
-
-   ```
-
-4\. **List All Websites**
-
-   - **Purpose:** Display all websites for which passwords are stored.
-
-   - **Steps:**
-
-     1. Select **"List all websites"** from the main menu.
-
-   ```bash
-
-   ? Select an action: List all websites
-
-   Stored Websites:
-
-   1. example.com
-
-   2. testsite.com
-
-   ```
-
-5\. **Exit**
-
-   - **Purpose:** Safely exit the application.
-
-   - **Steps:**
-
-     1. Select **"Exit"** from the main menu.
-
-   ```bash
-
-   ? Select an action: Exit
-
-   Goodbye!
-
-   ```
-
-```
+    `? Select an action: Exit
+    Goodbye!`
 
 
 ## Security
