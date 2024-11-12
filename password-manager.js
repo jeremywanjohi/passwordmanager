@@ -1,9 +1,8 @@
 // password-manager.js
 
-const fs = require('fs').promises;
-const path = require('path');
-const { subtle } = require('crypto').webcrypto;
-const crypto = require('crypto');
+import { promises as fs } from 'fs';
+import path from 'path';
+import crypto from 'crypto';
 
 /**
  * Utility function to generate random bytes.
@@ -47,7 +46,7 @@ class Keychain {
         const passwordBuffer = enc.encode(masterPassword);
 
         // Derive a master key using PBKDF2
-        const keyMaterial = await subtle.importKey(
+        const keyMaterial = await crypto.webcrypto.subtle.importKey(
             'raw',
             passwordBuffer,
             { name: 'PBKDF2' },
@@ -56,7 +55,7 @@ class Keychain {
         );
 
         // Derive master encryption key
-        this.masterKey = await subtle.deriveKey(
+        this.masterKey = await crypto.webcrypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
                 salt: salt,
@@ -70,7 +69,7 @@ class Keychain {
         );
 
         // Derive HMAC key using the same PBKDF2
-        this.hmacKey = await subtle.deriveKey(
+        this.hmacKey = await crypto.webcrypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
                 salt: salt,
@@ -104,7 +103,7 @@ class Keychain {
         const enc = new TextEncoder();
         const dataString = JSON.stringify(this.kvs.data);
         const dataBuffer = enc.encode(dataString);
-        const signature = await subtle.sign(
+        const signature = await crypto.webcrypto.subtle.sign(
             'HMAC',
             this.hmacKey,
             dataBuffer
@@ -125,7 +124,7 @@ class Keychain {
         const dataBuffer = enc.encode(dataString);
         const signature = Buffer.from(this.kvs.hmac, 'hex');
 
-        const isValid = await subtle.verify(
+        const isValid = await crypto.webcrypto.subtle.verify(
             'HMAC',
             this.hmacKey,
             signature,
@@ -150,7 +149,7 @@ class Keychain {
         const iv = await getRandomBytes(12); // 96-bit IV for AES-GCM
         const plaintextBuffer = enc.encode(plaintext);
 
-        const ciphertextBuffer = await subtle.encrypt(
+        const ciphertextBuffer = await crypto.webcrypto.subtle.encrypt(
             {
                 name: 'AES-GCM',
                 iv: iv
@@ -177,7 +176,7 @@ class Keychain {
 
         let plaintextBuffer;
         try {
-            plaintextBuffer = await subtle.decrypt(
+            plaintextBuffer = await crypto.webcrypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
                     iv: iv
@@ -301,7 +300,7 @@ class Keychain {
         const enc = new TextEncoder();
         const passwordBuffer = enc.encode(this.masterPassword);
 
-        const keyMaterial = await subtle.importKey(
+        const keyMaterial = await crypto.webcrypto.subtle.importKey(
             'raw',
             passwordBuffer,
             { name: 'PBKDF2' },
@@ -309,7 +308,7 @@ class Keychain {
             ['deriveKey']
         );
 
-        this.masterKey = await subtle.deriveKey(
+        this.masterKey = await crypto.webcrypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
                 salt: salt,
@@ -322,7 +321,7 @@ class Keychain {
             ['encrypt', 'decrypt']
         );
 
-        this.hmacKey = await subtle.deriveKey(
+        this.hmacKey = await crypto.webcrypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
                 salt: salt,
@@ -353,4 +352,4 @@ class Keychain {
     }
 }
 
-module.exports = Keychain;
+export default Keychain;

@@ -1,0 +1,9 @@
+{
+  "kvs": {
+    "salt": "ca95540a6034bfbddc9dd5d890ed4402",
+    "data": {
+      "www.google.com": "90a87c6298a09a912b19702d:adac244d4f3159dc24fb08b91df6835bec1595ea51f506dca4"
+    },
+    "hmac": "91459e77050a310cbb36df43971be072e097631583451320f892714fcb97af97"
+  }
+}

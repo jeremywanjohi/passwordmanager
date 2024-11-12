@@ -1,9 +1,9 @@
 // test/test-password-manager.js
 
-const expect = require('expect.js');
-const Keychain = require('../password-manager');
-const fs = require('fs').promises;
-const path = require('path');
+import expect from 'expect.js';
+import Keychain from '../password-manager.js'; // Ensure the '.js' extension is included
+import { promises as fs } from 'fs';
+import path from 'path';
 
 describe('Password manager', function() {
     this.timeout(10000); // Increase timeout for cryptographic operations
