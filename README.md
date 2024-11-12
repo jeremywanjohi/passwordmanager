@@ -93,7 +93,7 @@ main();
     await keychain.load('passwords.json');
     ```
 
-```markdown
+
 
 ### Using the CLI
 
