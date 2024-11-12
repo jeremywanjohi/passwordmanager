@@ -95,7 +95,7 @@ main();
 
 
 
-`### Using the CLI
+### Using the CLI
 
 The Password Manager CLI provides an interactive way to manage your passwords securely.
 
