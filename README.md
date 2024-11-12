@@ -191,7 +191,7 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      3. Enter the password.
 
-   ```bash
+   ```plaintext
 
    ? Select an action: Add a password
 
@@ -213,7 +213,7 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      2. Enter the website URL or name.
 
-   ```bash
+   ```plaintext
 
    ? Select an action: Retrieve a password
 
@@ -233,8 +233,8 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      2. Enter the website URL or name.
 
-   ```bash
-
+   ```plaintext
+   
    ? Select an action: Remove a password
 
    ? Enter the website URL or name to remove the password: example.com
@@ -251,7 +251,7 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      1. Select **"List all websites"** from the main menu.
 
-   ```bash
+   ```plaintext
 
    ? Select an action: List all websites
 
@@ -271,7 +271,7 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      1. Select **"Exit"** from the main menu.
 
-   ```bash
+   ```plaintext
 
    ? Select an action: Exit
    
