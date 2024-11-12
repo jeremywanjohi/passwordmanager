@@ -36,8 +36,8 @@ This Password Manager is a secure and encrypted system for storing and managing 
 
 1. **Clone the Repository**:
     ```bash
-    git clone https://github.com/jeremywanjohi/passmanager.git
-    cd passmanager
+    git clone https://github.com/jeremywanjohi/passwordmanager.git
+    cd passwordmanager
     ```
 
 2. **Install Dependencies**: Make sure Node.js is installed. Then, run:
