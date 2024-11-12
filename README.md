@@ -127,31 +127,12 @@ To start the CLI, navigate to your project directory in the terminal and run:
 
      - Should be strong and unique for maximum security.
 
-   ```bash
-
-   Welcome to the Secure Password Manager CLI
-
-   ? Create a master password: ********
-
-   ? Confirm your master password: ********
-
-   New keychain created and saved successfully.
-
-   ```
+ 
 
 2\. **Load Existing Keychain:**
 
    If a keychain already exists, you'll be prompted to enter your master password to access your stored passwords.
 
-   ```bash
-
-   Welcome to the Secure Password Manager CLI
-
-   ? Enter your master password: ********
-
-   Keychain loaded successfully.
-
-   ```
 
 #### Main Menu
 
@@ -191,17 +172,6 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      3. Enter the password.
 
-   ```plaintext
-
-   ? Select an action: Add a password
-
-   ? Enter the website URL or name: example.com
-
-   ? Enter the password: ************
-
-   Password for "example.com" added successfully.
-
-   ```
 
 2\. **Retrieve a Password**
 
@@ -213,15 +183,7 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      2. Enter the website URL or name.
 
-   ```plaintext
 
-   ? Select an action: Retrieve a password
-
-   ? Enter the website URL or name to retrieve the password: example.com
-
-   Password for "example.com": password123
-
-   ```
 
 3\. **Remove a Password**
 
@@ -233,15 +195,6 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      2. Enter the website URL or name.
 
-   ```plaintext
-   
-   ? Select an action: Remove a password
-
-   ? Enter the website URL or name to remove the password: example.com
-
-   Password for "example.com" removed successfully.
-
-   ```
 
 4\. **List All Websites**
 
@@ -251,17 +204,7 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      1. Select **"List all websites"** from the main menu.
 
-   ```plaintext
-
-   ? Select an action: List all websites
-
-   Stored Websites:
-
-   1. example.com
-
-   2. testsite.com
-
-   ```
+ 
 
 5\. **Exit**
 
@@ -271,13 +214,6 @@ Use the arrow keys to navigate and press `Enter` to select an option.
 
      1. Select **"Exit"** from the main menu.
 
-   ```plaintext
-
-   ? Select an action: Exit
-   
-   Goodbye!
-
-   ```
 ```
 
 ## Security
