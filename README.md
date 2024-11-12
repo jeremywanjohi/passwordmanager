@@ -11,7 +11,6 @@ This Password Manager is a secure and encrypted system for storing and managing 
   - [Basic Operations](#basic-operations)
 - [Security](#security)
 - [Testing](#testing)
-- [Project Structure](#project-structure)
 - [Security Discussion Questions](#security-discussion-questions)
 - [License](#license)
 
@@ -166,10 +165,4 @@ The tests check various functionalities, including:
 
    To enable multi-user support, we can implement namespace separation and role-based access controls. Each user, such as Alice and Bob, has a unique master key derived from their individual master passwords, ensuring that their private data remains isolated. For shared passwords, such as for nytimes, we assign them to a common namespace accessible only to authorized users. This setup allows Alice and Bob to access and update shared entries without granting them access to each other's private passwords for other websites, thus maintaining security and privacy across individual and shared data.
 
-## License
 
-This project is licensed under the MIT License. See the LICENSE file for details.
-
-```
-
-This improved README file structure and code formatting ensure clarity and readability, making it easier to understand and navigate.
