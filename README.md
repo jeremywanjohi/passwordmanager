@@ -24,41 +24,33 @@ This Password Manager is a secure and encrypted system for storing and managing 
 ## Installation
 
 1. **Clone the Repository**:
-   ```bash
-   git clone https://github.com/jeremywanjohi/passmanager.git
-   cd passmanager
+    ```bash
+    git clone https://github.com/jeremywanjohi/passmanager.git
+    cd passmanager
+    ```
 
+2. **Install Dependencies**: Make sure Node.js is installed. Then, run:
+    ```bash
+    npm install
+    ```
 
+3. **Set Up Environment Variables** (optional): If your code relies on environment variables, set them in a `.env` file.
 
-2.  **Install Dependencies**: Make sure Node.js is installed. Then, run:
-
-    bash
-
-    Copy code
-
-    `npm install`
-
-3.  **Set Up Environment Variables** (optional): If your code relies on environment variables, set them in a `.env` file.
-
-Usage
------
+## Usage
 
 ### Initializing the Keychain
 
 To initialize the password manager with a master password:
-
-javascript
-
-Copy code
-
-`const Keychain = require('./password-manager');
+```javascript
+const Keychain = require('./password-manager');
 
 async function main() {
     const keychain = new Keychain();
     await keychain.init('your-master-password');
 }
 
-main();`
+main();
+
 
 ### Basic Operations
 
