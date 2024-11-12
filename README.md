@@ -91,6 +91,152 @@ main();
     ```javascript
     await keychain.load('passwords.json');
     ```
+### Using the CLI
+
+The Password Manager CLI provides an interactive way to manage your passwords securely.
+
+#### Launching the CLI
+
+To start the CLI, navigate to your project directory in the terminal and run:
+
+- **Using NPM Script:**
+  ```bash
+  npm start
+
+  #### Initial Setup
+
+1.  **Create a Master Password:**
+
+    If it's your first time running the CLI, you'll be prompted to create a master password.
+
+    -   **Requirements:**
+        -   Minimum of 6 characters.
+        -   Should be strong and unique for maximum security.
+
+    bash
+
+    Copy code
+
+    `Welcome to the Secure Password Manager CLI
+    ? Create a master password: ********
+    ? Confirm your master password: ********
+    New keychain created and saved successfully.`
+
+2.  **Load Existing Keychain:**
+
+    If a keychain already exists, you'll be prompted to enter your master password to access your stored passwords.
+
+    bash
+
+    Copy code
+
+    `Welcome to the Secure Password Manager CLI
+    ? Enter your master password: ********
+    Keychain loaded successfully.`
+
+#### Main Menu
+
+After initialization, you'll see a menu with the following options:
+
+plaintext
+
+Copy code
+
+`? Select an action:
+❯ Add a password
+  Retrieve a password
+  Remove a password
+  List all websites
+  ────────────
+  Exit`
+
+Use the arrow keys to navigate and press `Enter` to select an option.
+
+#### Basic Operations
+
+1.  **Add a Password**
+
+    -   **Purpose:** Store a new password for a specific website or application.
+    -   **Steps:**
+        1.  Select **"Add a password"** from the main menu.
+        2.  Enter the website URL or name.
+        3.  Enter the password.
+
+    bash
+
+    Copy code
+
+    `? Select an action: Add a password
+    ? Enter the website URL or name: example.com
+    ? Enter the password: ************
+    Password for "example.com" added successfully.`
+
+2.  **Retrieve a Password**
+
+    -   **Purpose:** Fetch the password for a specific website.
+    -   **Steps:**
+        1.  Select **"Retrieve a password"** from the main menu.
+        2.  Enter the website URL or name.
+
+    bash
+
+    Copy code
+
+    `? Select an action: Retrieve a password
+    ? Enter the website URL or name to retrieve the password: example.com
+    Password for "example.com": password123`
+
+3.  **Remove a Password**
+
+    -   **Purpose:** Delete the password entry for a specific website.
+    -   **Steps:**
+        1.  Select **"Remove a password"** from the main menu.
+        2.  Enter the website URL or name.
+
+    bash
+
+    Copy code
+
+    `? Select an action: Remove a password
+    ? Enter the website URL or name to remove the password: example.com
+    Password for "example.com" removed successfully.`
+
+4.  **List All Websites**
+
+    -   **Purpose:** Display all websites for which passwords are stored.
+    -   **Steps:**
+        1.  Select **"List all websites"** from the main menu.
+
+    bash
+
+    Copy code
+
+    `? Select an action: List all websites
+    Stored Websites:
+    1. example.com
+    2. testsite.com`
+
+5.  **Exit**
+
+    -   **Purpose:** Safely exit the application.
+    -   **Steps:**
+        1.  Select **"Exit"** from the main menu.
+
+    bash
+
+    Copy code
+
+    `? Select an action: Exit
+    Goodbye!`
+
+Copy code
+
+o1-mini
+
+You have 5 responses from o1-mini remaining.
+
+If you hit the limit, resp
+
 
 ## Security
 
