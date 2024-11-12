@@ -9,7 +9,7 @@ This Password Manager is a secure and encrypted system for storing and managing 
 | Member | ID     | Name                          |
 |--------|--------|-------------------------------|
 | 1      | 150892 | Islam Faruk Jeizan            |
-| 2      | 151947 | Chikuro Emmanuel Mbaji        |
+| 2      | 151947 | Chikuro Emmanuel        |
 | 3      | 151673 | Simiyu Michael Keith Wanjala  |
 | 4      | 150000 | Wanjohi Jeremy Kariuki        |
 
