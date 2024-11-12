@@ -51,7 +51,7 @@ This Password Manager is a secure and encrypted system for storing and managing 
 
 ### Initializing the Keychain
 
-To initialize the password manager with a master password:
+To initialise the password manager with a master password:
 ```javascript
 const Keychain = require('./password-manager');
 
