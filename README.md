@@ -28,7 +28,7 @@ This Password Manager is a secure and encrypted system for storing and managing 
 
 - **Encryption**: Uses AES-GCM to encrypt passwords, ensuring data confidentiality.
 - **Data Integrity**: HMAC is used to verify data integrity, detecting tampering or corruption.
-- **CRUD Operations**: Supports setting, retrieving, updating, and deleting passwords for different domain
+- **CRUD Operations**: Supports setting, retrieving, updating, and deleting passwords for different domains.
 - **Data Persistence**: Dumps and loads encrypted password data to/from a file.
 - **Password-Protected Access**: Uses a master password to initialize the keychain.
 
