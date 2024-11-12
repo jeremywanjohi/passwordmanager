@@ -157,7 +157,7 @@ To start the CLI, navigate to your project directory in the terminal and run:
 
 After initialization, you'll see a menu with the following options:
 
-```plaintext
+```plaintext 
 
 ? Select an action:
 
