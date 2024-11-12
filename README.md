@@ -106,17 +106,13 @@ To start the CLI, navigate to your project directory in the terminal and run:
 - **Using NPM Script:**
 
   ```bash
-
   npm start
-
   ```
 
 - **Directly with Node.js:**
 
   ```bash
-
   node cli.js
-
   ```
 
 #### Initial Setup
