@@ -4,6 +4,61 @@
 
 This Password Manager is a secure and encrypted system for storing and managing passwords for different websites or applications. Built using Node.js and crypto APIs, it leverages AES-GCM encryption and HMAC for data integrity. This project ensures that sensitive data remains secure while being easily accessible when needed.
 
+Members
+
+|
+
+1
+
+ |
+
+150892
+
+ |
+
+Islam Faruk Jeizan
+
+ |
+|
+
+2
+
+ |
+
+151947
+
+ |
+
+Chikuro Emmanuel Mbaji
+
+ |
+|
+
+3
+
+ |
+
+151673
+
+ |
+
+Simiyu Michael Keith Wanjala
+
+ |
+|
+
+4
+
+ |
+
+150000
+
+ |
+
+Wanjohi Jeremy Kariuki
+
+ |
+
 ## Table of Contents
 - [Features](#features)
 - [Installation](#installation)
