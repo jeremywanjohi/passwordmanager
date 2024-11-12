@@ -99,38 +99,6 @@ main();
 
     ```
 
-### Example
-
-```javascript
-
-const Keychain = require('./password-manager');
-
-async function main() {
-
-    const keychain = new Keychain();
-
-    await keychain.init('your-master-password');
-
-    await keychain.set('example.com', 'password123');
-
-    console.log(await keychain.get('example.com')); // Outputs: password123
-
-    await keychain.dump('passwords.json');
-
-    keychain.clear(); // Clear memory
-
-    await keychain.init('your-master-password');
-
-    await keychain.load('passwords.json');
-
-    console.log(await keychain.get('example.com')); // Outputs: password123
-
-}
-
-main();
-
-```
-
 ## Security
 
 This project is built with security as a primary focus:
@@ -171,23 +139,6 @@ The tests check various functionalities, including:
 
 - Integrity checks to detect tampering
 
-## Project Structure
-
-```bash
-
-PasswordManager/
-
-├── password-manager.js          # Main Keychain class
-
-├── test/
-
-│   └── test-password-manager.js # Unit tests
-
-├── README.md                    # Project documentation
-
-└── package.json                 # Dependencies and scripts
-
-```
 
 ## Security Discussion Questions
 
