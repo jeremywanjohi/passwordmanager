@@ -1,52 +1,49 @@
 // password-manager.js
 
-import { promises as fs } from 'fs';
-import path from 'path';
-import crypto from 'crypto';
-
 /**
- * Utility function to generate random bytes.
- * @param {number} length - Number of bytes to generate.
- * @returns {Promise<Buffer>}
+ * PasswordManager class for managing encrypted passwords.
+ * Utilizes the Web Crypto API and localStorage for encryption and storage.
  */
-async function getRandomBytes(length) {
-    return crypto.randomBytes(length);
-}
-
-/**
- * Keychain class for managing encrypted passwords.
- */
-class Keychain {
+export default class PasswordManager {
     constructor() {
-        // Internal key-value store
-        this.kvs = {};
+        // Load data from localStorage or initialize a new structure
+        this.kvs = JSON.parse(localStorage.getItem('passwordManagerData')) || {
+            salt: null,
+            data: {},
+            hmac: ''
+        };
         this.masterKey = null; // CryptoKey derived from master password
         this.hmacKey = null;   // CryptoKey for HMAC integrity
         this.masterPassword = null; // Stored for key re-derivation
     }
 
     /**
-     * Initializes the Keychain with the master password.
+     * Initializes the PasswordManager with the master password.
      * Derives a master key and an HMAC key using PBKDF2.
-     * Ensures that PBKDF2 is called only once.
      * @param {string} masterPassword 
      */
     async init(masterPassword) {
         if (this.masterKey || this.hmacKey) {
-            throw new Error("Keychain is already initialized.");
+            throw new Error("PasswordManager is already initialized.");
         }
 
         this.masterPassword = masterPassword;
 
-        // Generate a random salt
-        const salt = await getRandomBytes(16);
+        // Generate a random salt if not already present
+        let salt;
+        if (this.kvs.salt) {
+            salt = this.hexToBuffer(this.kvs.salt);
+        } else {
+            salt = crypto.getRandomValues(new Uint8Array(16));
+            this.kvs.salt = this.bufferToHex(salt);
+            await this.updateLocalStorage();
+        }
 
         // Encode the master password
-        const enc = new TextEncoder();
-        const passwordBuffer = enc.encode(masterPassword);
+        const passwordBuffer = new TextEncoder().encode(masterPassword);
 
         // Derive a master key using PBKDF2
-        const keyMaterial = await crypto.webcrypto.subtle.importKey(
+        const keyMaterial = await crypto.subtle.importKey(
             'raw',
             passwordBuffer,
             { name: 'PBKDF2' },
@@ -55,7 +52,7 @@ class Keychain {
         );
 
         // Derive master encryption key
-        this.masterKey = await crypto.webcrypto.subtle.deriveKey(
+        this.masterKey = await crypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
                 salt: salt,
@@ -69,7 +66,7 @@ class Keychain {
         );
 
         // Derive HMAC key using the same PBKDF2
-        this.hmacKey = await crypto.webcrypto.subtle.deriveKey(
+        this.hmacKey = await crypto.subtle.deriveKey(
             {
                 name: 'PBKDF2',
                 salt: salt,
@@ -82,15 +79,13 @@ class Keychain {
             ['sign', 'verify']
         );
 
-        // Initialize kvs with salt and empty data
-        this.kvs = {
-            salt: salt.toString('hex'),
-            data: {},
-            hmac: '' // Will be set after data initialization
-        };
-
-        // Compute initial HMAC
-        await this.updateHmac();
+        // If HMAC exists, verify integrity
+        if (this.kvs.hmac) {
+            await this.verifyIntegrity();
+        } else {
+            // Compute initial HMAC
+            await this.updateHmac();
+        }
     }
 
     /**
@@ -98,17 +93,17 @@ class Keychain {
      */
     async updateHmac() {
         if (!this.hmacKey) {
-            throw new Error("Keychain is not initialized.");
+            throw new Error("PasswordManager is not initialized.");
         }
-        const enc = new TextEncoder();
         const dataString = JSON.stringify(this.kvs.data);
-        const dataBuffer = enc.encode(dataString);
-        const signature = await crypto.webcrypto.subtle.sign(
+        const dataBuffer = new TextEncoder().encode(dataString);
+        const signature = await crypto.subtle.sign(
             'HMAC',
             this.hmacKey,
             dataBuffer
         );
-        this.kvs.hmac = Buffer.from(signature).toString('hex');
+        this.kvs.hmac = this.bufferToHex(new Uint8Array(signature));
+        await this.updateLocalStorage();
     }
 
     /**
@@ -117,14 +112,13 @@ class Keychain {
      */
     async verifyIntegrity() {
         if (!this.hmacKey) {
-            throw new Error("Keychain is not initialized.");
+            throw new Error("PasswordManager is not initialized.");
         }
-        const enc = new TextEncoder();
         const dataString = JSON.stringify(this.kvs.data);
-        const dataBuffer = enc.encode(dataString);
-        const signature = Buffer.from(this.kvs.hmac, 'hex');
+        const dataBuffer = new TextEncoder().encode(dataString);
+        const signature = this.hexToBuffer(this.kvs.hmac);
 
-        const isValid = await crypto.webcrypto.subtle.verify(
+        const isValid = await crypto.subtle.verify(
             'HMAC',
             this.hmacKey,
             signature,
@@ -143,13 +137,12 @@ class Keychain {
      */
     async encrypt(plaintext) {
         if (!this.masterKey) {
-            throw new Error("Keychain is not initialized. Call init(masterPassword) first.");
+            throw new Error("PasswordManager is not initialized. Call init(masterPassword) first.");
         }
-        const enc = new TextEncoder();
-        const iv = await getRandomBytes(12); // 96-bit IV for AES-GCM
-        const plaintextBuffer = enc.encode(plaintext);
+        const iv = crypto.getRandomValues(new Uint8Array(12)); // 96-bit IV for AES-GCM
+        const plaintextBuffer = new TextEncoder().encode(plaintext);
 
-        const ciphertextBuffer = await crypto.webcrypto.subtle.encrypt(
+        const ciphertextBuffer = await crypto.subtle.encrypt(
             {
                 name: 'AES-GCM',
                 iv: iv
@@ -158,7 +151,7 @@ class Keychain {
             plaintextBuffer
         );
 
-        return Buffer.from(iv).toString('hex') + ':' + Buffer.from(ciphertextBuffer).toString('hex');
+        return `${this.bufferToHex(iv)}:${this.bufferToHex(new Uint8Array(ciphertextBuffer))}`;
     }
 
     /**
@@ -168,15 +161,15 @@ class Keychain {
      */
     async decrypt(encryptedData) {
         if (!this.masterKey) {
-            throw new Error("Keychain is not initialized. Call init(masterPassword) first.");
+            throw new Error("PasswordManager is not initialized. Call init(masterPassword) first.");
         }
         const [ivHex, ciphertextHex] = encryptedData.split(':');
-        const iv = Buffer.from(ivHex, 'hex');
-        const ciphertext = Buffer.from(ciphertextHex, 'hex');
+        const iv = this.hexToBuffer(ivHex);
+        const ciphertext = this.hexToBuffer(ciphertextHex);
 
         let plaintextBuffer;
         try {
-            plaintextBuffer = await crypto.webcrypto.subtle.decrypt(
+            plaintextBuffer = await crypto.subtle.decrypt(
                 {
                     name: 'AES-GCM',
                     iv: iv
@@ -188,8 +181,7 @@ class Keychain {
             throw new Error("Decryption failed. Possible tampering detected.");
         }
 
-        const dec = new TextDecoder();
-        return dec.decode(plaintextBuffer);
+        return new TextDecoder().decode(plaintextBuffer);
     }
 
     /**
@@ -197,9 +189,9 @@ class Keychain {
      * @param {string} domain 
      * @param {string} password 
      */
-    async set(domain, password) {
+    async addPassword(domain, password) {
         if (!this.masterKey) {
-            throw new Error("Keychain is not initialized. Call init(masterPassword) first.");
+            throw new Error("PasswordManager is not initialized. Call init(masterPassword) first.");
         }
 
         await this.verifyIntegrity();
@@ -215,9 +207,9 @@ class Keychain {
      * @param {string} domain 
      * @returns {Promise<string>} - The decrypted password.
      */
-    async get(domain) {
+    async getPassword(domain) {
         if (!this.masterKey) {
-            throw new Error("Keychain is not initialized. Call init(masterPassword) first.");
+            throw new Error("PasswordManager is not initialized. Call init(masterPassword) first.");
         }
 
         await this.verifyIntegrity();
@@ -234,9 +226,9 @@ class Keychain {
      * Removes the password for a given domain.
      * @param {string} domain 
      */
-    async remove(domain) {
+    async removePassword(domain) {
         if (!this.masterKey) {
-            throw new Error("Keychain is not initialized. Call init(masterPassword) first.");
+            throw new Error("PasswordManager is not initialized. Call init(masterPassword) first.");
         }
 
         await this.verifyIntegrity();
@@ -250,106 +242,101 @@ class Keychain {
     }
 
     /**
-     * Dumps the keychain to a specified file.
-     * Serialization includes the kvs object.
-     * @param {string} filepath 
+     * Exports the password manager data as a JSON file.
      */
-    async dump(filepath) {
-        if (!this.masterKey) {
-            throw new Error("Keychain is not initialized. Call init(masterPassword) first.");
-        }
+    exportData() {
+        const dataStr = JSON.stringify(this.kvs, null, 2);
+        const blob = new Blob([dataStr], { type: "application/json" });
+        const url = URL.createObjectURL(blob);
 
-        const dataToDump = {
-            kvs: this.kvs
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = 'password-manager-data.json';
+        a.click();
+        URL.revokeObjectURL(url);
+    }
+
+    /**
+     * Imports password manager data from a JSON file.
+     * @param {File} file 
+     */
+    async importData(file) {
+        const reader = new FileReader();
+
+        const loadPromise = new Promise((resolve, reject) => {
+            reader.onload = async () => {
+                try {
+                    const importedData = JSON.parse(reader.result);
+                    // Basic validation
+                    if (!importedData.salt || !importedData.data || !importedData.hmac) {
+                        throw new Error("Invalid data format.");
+                    }
+                    this.kvs = importedData;
+                    await this.updateLocalStorage();
+                    resolve();
+                } catch (error) {
+                    reject(error);
+                }
+            };
+
+            reader.onerror = () => {
+                reject(new Error("Failed to read the file."));
+            };
+        });
+
+        reader.readAsText(file);
+        return loadPromise;
+    }
+
+    /**
+     * Clears all data from the password manager.
+     */
+    clearAllData() {
+        this.kvs = {
+            salt: null,
+            data: {},
+            hmac: ''
         };
-
-        const jsonString = JSON.stringify(dataToDump, null, 2);
-        await fs.writeFile(path.resolve(filepath), jsonString, 'utf8');
-    }
-
-    /**
-     * Loads the keychain from a specified file.
-     * Deserialization restores the kvs object and verifies integrity.
-     * @param {string} filepath 
-     */
-    async load(filepath) {
-        if (!this.masterPassword) {
-            throw new Error("Keychain is not initialized. Call init(masterPassword) first.");
-        }
-
-        const fileContent = await fs.readFile(path.resolve(filepath), 'utf8');
-        let parsed;
-        try {
-            parsed = JSON.parse(fileContent);
-        } catch (e) {
-            throw new Error("Invalid JSON format in keychain file.");
-        }
-
-        if (!parsed.kvs || typeof parsed.kvs !== 'object') {
-            throw new Error("Invalid keychain file format.");
-        }
-
-        // Extract the salt
-        const saltHex = parsed.kvs.salt;
-        if (!saltHex) {
-            throw new Error("Keychain file is missing salt.");
-        }
-        const salt = Buffer.from(saltHex, 'hex');
-
-        // Re-derive the masterKey and hmacKey using stored master password and loaded salt
-        const enc = new TextEncoder();
-        const passwordBuffer = enc.encode(this.masterPassword);
-
-        const keyMaterial = await crypto.webcrypto.subtle.importKey(
-            'raw',
-            passwordBuffer,
-            { name: 'PBKDF2' },
-            false,
-            ['deriveKey']
-        );
-
-        this.masterKey = await crypto.webcrypto.subtle.deriveKey(
-            {
-                name: 'PBKDF2',
-                salt: salt,
-                iterations: 100000,
-                hash: 'SHA-256'
-            },
-            keyMaterial,
-            { name: 'AES-GCM', length: 256 },
-            false,
-            ['encrypt', 'decrypt']
-        );
-
-        this.hmacKey = await crypto.webcrypto.subtle.deriveKey(
-            {
-                name: 'PBKDF2',
-                salt: salt,
-                iterations: 100000,
-                hash: 'SHA-256'
-            },
-            keyMaterial,
-            { name: 'HMAC', hash: 'SHA-256', length: 256 },
-            false,
-            ['sign', 'verify']
-        );
-
-        // Set the kvs
-        this.kvs = parsed.kvs;
-
-        // Verify integrity
-        await this.verifyIntegrity();
-    }
-
-    /**
-     * Clears the in-memory key-value store.
-     */
-    clear() {
-        this.kvs = {};
         this.masterKey = null;
         this.hmacKey = null;
         this.masterPassword = null;
+        localStorage.removeItem('passwordManagerData');
+    }
+
+    /**
+     * Saves the current kvs object to localStorage.
+     */
+    async updateLocalStorage() {
+        localStorage.setItem('passwordManagerData', JSON.stringify(this.kvs));
+    }
+
+    /**
+     * Converts a Buffer to a hexadecimal string.
+     * @param {Uint8Array} buffer 
+     * @returns {string}
+     */
+    bufferToHex(buffer) {
+        return Array.from(buffer).map(b => b.toString(16).padStart(2, '0')).join('');
+    }
+
+    /**
+     * Converts a hexadecimal string to a Buffer.
+     * @param {string} hex 
+     * @returns {ArrayBuffer}
+     */
+    hexToBuffer(hex) {
+        const bytes = new Uint8Array(hex.length / 2);
+        for (let i = 0; i < bytes.length; i++) {
+            bytes[i] = parseInt(hex.substr(i * 2, 2), 16);
+        }
+        return bytes.buffer;
+    }
+
+    /**
+     * Checks if the Password Manager is initialized.
+     * @returns {boolean}
+     */
+    isInitialized() {
+        return this.masterKey !== null && this.hmacKey !== null;
     }
 }
-
-export default Keychain;

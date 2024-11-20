@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Secure Password Manager</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <!-- Login Section -->
+    <div class="container" id="login-container">
+        <h2>Secure Password Manager</h2>
+        <p id="login-message" class="message"></p>
+        <input type="password" id="master-password" placeholder="Enter Master Password" />
+        <button id="initialize-btn">Initialize</button>
+    </div>
+
+    <!-- Application Section -->
+    <div class="container hidden" id="app-container">
+        <h2>Password Manager</h2>
+        <p id="app-message" class="message"></p>
+
+        <!-- Add Password -->
+        <section>
+            <h3>Add New Password</h3>
+            <input type="text" id="domain-input" placeholder="Domain (e.g., example.com)" />
+            <input type="password" id="password-input" placeholder="Password" />
+            <button id="add-password-btn">Add Password</button>
+        </section>
+
+        <!-- Retrieve Password -->
+        <section>
+            <h3>Retrieve Password</h3>
+            <input type="text" id="retrieve-domain-input" placeholder="Domain (e.g., example.com)" />
+            <button id="retrieve-password-btn">Retrieve Password</button>
+            <div id="retrieved-password" class="result"></div>
+        </section>
+
+        <!-- Remove Password -->
+        <section>
+            <h3>Remove Password</h3>
+            <input type="text" id="remove-domain-input" placeholder="Domain (e.g., example.com)" />
+            <button id="remove-password-btn">Remove Password</button>
+        </section>
+
+        <!-- Data Operations -->
+        <section>
+            <h3>Data Operations</h3>
+            <button id="export-data-btn">Export Data</button>
+            <input type="file" id="import-data-input" accept=".json" />
+            <button id="import-data-btn">Import Data</button>
+            <button id="clear-data-btn" class="warning">Clear All Data</button>
+        </section>
+    </div>
+
+    <script type="module" src="script.js"></script>
+</body>
+</html>
